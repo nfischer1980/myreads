@@ -14,7 +14,7 @@ const Details = () => {
     };
 
     getBooks();
-  }, []);
+  }, [bookId]);
 
   const navigate = useNavigate();
 
