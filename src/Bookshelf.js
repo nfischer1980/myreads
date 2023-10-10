@@ -1,5 +1,4 @@
 import Book from "./Book";
-import React, { useRef, useState } from "react";
 
 const Bookshelf = ({
   name,
