@@ -7,12 +7,6 @@ const Bookshelves = ({ books, onOptionChange }) => {
   const [selectBook, setSelectBook] = useState();
   const [selectShelf, setSelectShelf] = useState();
 
-  const dragEnter = () => {
-    console.log(
-      "book: " + selectBook?.title + " is dragged to shelf: " + selectShelf
-    );
-  };
-
   const handleDragBook = (book) => {
     setSelectBook(book);
   };
