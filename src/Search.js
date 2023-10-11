@@ -1,65 +1,59 @@
-import { Link } from "react-router-dom";
-import { useState, useEffect } from "react";
+import { useParams, useNavigate } from "react-router-dom";
 import * as BooksAPI from "./BooksAPI";
-import Book from "./Book";
+import { useState, useEffect } from "react";
 
-const Search = ({ onOptionChange, currentBooks }) => {
-  const [books, setBooks] = useState([]);
-  const [query, setQuery] = useState("");
-
-  const handleQuery = (query) => {
-    setQuery(query);
-  };
+const Details = () => {
+  const [book, setBook] = useState();
+  const { bookId } = useParams();
 
   useEffect(() => {
     const getBooks = async () => {
-      if (query) {
-        const res = await BooksAPI.search(query);
-        if (res && res.length > 0) {
-          res.map(
-            (book) =>
-              (book.shelf =
-                currentBooks.filter((x) => x.id === book.id)[0]?.shelf ??
-                "none")
-          );
-        }
-        setBooks(res);
-      }
+      const res = await BooksAPI.get(bookId);
+      console.log(res);
+      setBook(res);
     };
 
     getBooks();
-  }, [query, currentBooks]);
+  }, [bookId]);
+
+  const navigate = useNavigate();
+
+  const GoBack = () => {
+    navigate(-1);
+  };
 
   return (
-    <div className="search-books">
-      <div className="search-books-bar">
-        <Link to="/" className="close-search">
-          Close
-        </Link>
-        <div className="search-books-input-wrapper">
-          <input
-            name="query"
-            type="text"
-            placeholder="Search by title, author, or ISBN"
-            value={query}
-            onChange={(event) => handleQuery(event.target.value)}
-          />
+    <div>
+      <div onClick={GoBack} className="close-search"></div>
+      <div className="book-detail-holder">
+        <div className="book-detail">
+          {book && (
+            <div>
+              <div className="book-top">
+                <div
+                  className="book-cover"
+                  style={{
+                    width: 128,
+                    height: 193,
+                    backgroundImage: `url(${
+                      book.imageLinks?.smallThumbnail ?? book.previewLink
+                    }`,
+                  }}
+                ></div>
+              </div>
+              <div className="book-title">{book.title}</div>
+              <div className="book-authors">{book.authors?.join(", ")}</div>
+              <div className="book-info">
+                <p>{book.subtitle}</p>
+                <p>{book.categories?.join(", ")}</p>
+              </div>
+            </div>
+          )}
         </div>
+        <div className="book-description">{book?.description}</div>
       </div>
-      {books && books.length > 0 && query && (
-        <div className="search-books-results">
-          <ol className="books-grid">
-            {books.map((book) => (
-              <li key={book.id}>
-                <Book book={book} onOptionChange={onOptionChange} />
-              </li>
-            ))}
-          </ol>
-        </div>
-      )}
-      ;
     </div>
   );
 };
 
-export default Search;
+export default Details;
