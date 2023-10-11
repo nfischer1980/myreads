@@ -1,5 +1,6 @@
 import { useState } from "react";
 import ShelfOptions from "./ShelfOptions";
+import PropTypes from "prop-types";
 
 const Changer = ({ shelf, onStatusChange }) => {
   const [selected, setSelected] = useState(shelf);
@@ -15,7 +16,7 @@ const Changer = ({ shelf, onStatusChange }) => {
   return (
     <div className="book-shelf-changer">
       <select onChange={handleChange} value={selected ?? "none"}>
-        <option value="none" disabled>
+        <option value="move" disabled>
           Move to...
         </option>
         {ShelfOptions.map((o) => (
@@ -26,6 +27,11 @@ const Changer = ({ shelf, onStatusChange }) => {
       </select>
     </div>
   );
+};
+
+Changer.propTypes = {
+  shelf: PropTypes.string,
+  onStatusChange: PropTypes.func,
 };
 
 export default Changer;
