@@ -5,6 +5,7 @@ import { Route, Routes } from "react-router-dom";
 import Search from "./Search";
 import Details from "./Details";
 import * as BooksAPI from "./BooksAPI";
+import NotFound from "./NotFound";
 
 function App() {
   const [books, setBooks] = useState([]);
@@ -19,15 +20,10 @@ function App() {
   }, []);
 
   const onOptionChange = (book, shelf) => {
-    let tempBooks = books.filter((b) => b.id !== book.id);
     book.shelf = shelf;
-    tempBooks.push(book);
-    setBooks(tempBooks);
-    const update = async () => {
-      console.log(`updating book shelf ${shelf} for ${book.title}`);
-      await BooksAPI.update(book, shelf);
-    };
-    update();
+    BooksAPI.update(book, shelf).then(() => {
+      setBooks([...books.filter((b) => b.id !== book.id), book]);
+    });
     console.log(books);
   };
 
@@ -46,6 +42,7 @@ function App() {
         }
       ></Route>
       <Route path="/books/:bookId" element={<Details />} />
+      <Route path="*" element={<NotFound />}></Route>
     </Routes>
   );
 }
