@@ -1,59 +1,77 @@
-import { useParams, useNavigate } from "react-router-dom";
-import * as BooksAPI from "./BooksAPI";
+import { Link } from "react-router-dom";
 import { useState, useEffect } from "react";
+import * as BooksAPI from "./BooksAPI";
+import Book from "./Book";
+import PropTypes from "prop-types";
+import { useDebounce } from "usehooks-ts";
 
-const Details = () => {
-  const [book, setBook] = useState();
-  const { bookId } = useParams();
+const Search = ({ onOptionChange, currentBooks }) => {
+  const [books, setBooks] = useState([]);
+  const [query, setQuery] = useState("");
+  const debouncedQuery = useDebounce(query, 100);
+
+  const handleQuery = (query) => {
+    setQuery(query);
+  };
 
   useEffect(() => {
     const getBooks = async () => {
-      const res = await BooksAPI.get(bookId);
-      console.log(res);
-      setBook(res);
+      if (debouncedQuery) {
+        const res = await BooksAPI.search(debouncedQuery);
+        if (res && res.length > 0) {
+          res.map(
+            (book) =>
+              (book.shelf =
+                currentBooks.filter((x) => x.id === book.id)[0]?.shelf ??
+                "none")
+          );
+          setBooks(res);
+        } else {
+          setBooks(null);
+        }
+      }
     };
 
     getBooks();
-  }, [bookId]);
-
-  const navigate = useNavigate();
-
-  const GoBack = () => {
-    navigate(-1);
-  };
+  }, [debouncedQuery, currentBooks]);
 
   return (
-    <div>
-      <div onClick={GoBack} className="close-search"></div>
-      <div className="book-detail-holder">
-        <div className="book-detail">
-          {book && (
-            <div>
-              <div className="book-top">
-                <div
-                  className="book-cover"
-                  style={{
-                    width: 128,
-                    height: 193,
-                    backgroundImage: `url(${
-                      book.imageLinks?.smallThumbnail ?? book.previewLink
-                    }`,
-                  }}
-                ></div>
-              </div>
-              <div className="book-title">{book.title}</div>
-              <div className="book-authors">{book.authors?.join(", ")}</div>
-              <div className="book-info">
-                <p>{book.subtitle}</p>
-                <p>{book.categories?.join(", ")}</p>
-              </div>
-            </div>
-          )}
+    <div className="search-books">
+      <div className="search-books-bar">
+        <Link to="/" className="close-search">
+          Close
+        </Link>
+        <div className="search-books-input-wrapper">
+          <input
+            name="query"
+            type="text"
+            placeholder="Search by title, author, or ISBN"
+            value={query}
+            onChange={(event) => handleQuery(event.target.value)}
+          />
         </div>
-        <div className="book-description">{book?.description}</div>
+      </div>
+      <div className="search-books-results">
+        {books && books.length > 0 && query && (
+          <ol className="books-grid">
+            {books.map((book) => (
+              <li key={book.id}>
+                <Book book={book} onOptionChange={onOptionChange} />
+              </li>
+            ))}
+          </ol>
+        )}
+        {books === null && (
+          <h4>No books found using the query {debouncedQuery}</h4>
+        )}
       </div>
     </div>
   );
 };
 
-export default Details;
+Search.propTypes = {
+  currentBooks: PropTypes.array,
+  onOptionChange: PropTypes.func,
+};
+
+export default Search;
