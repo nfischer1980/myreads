@@ -1,5 +1,6 @@
 import Changer from "./Changer";
 import { Outlet, useNavigate } from "react-router-dom";
+import PropTypes from "prop-types";
 
 const Book = ({ book, onOptionChange, onBookDrag, onBookDrop }) => {
   const onStatusChange = (shelf) => {
@@ -47,6 +48,13 @@ const Book = ({ book, onOptionChange, onBookDrag, onBookDrop }) => {
       <Outlet />
     </div>
   );
+};
+
+Book.propTypes = {
+  book: PropTypes.object,
+  onOptionChange: PropTypes.func,
+  onBookDrag: PropTypes.func,
+  onBookDrop: PropTypes.func,
 };
 
 export default Book;
