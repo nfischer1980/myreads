@@ -2,6 +2,7 @@ import Bookshelf from "./Bookshelf";
 import ShelfOptions from "./ShelfOptions";
 import { Link } from "react-router-dom";
 import { useState } from "react";
+import PropTypes from "prop-types";
 
 const Bookshelves = ({ books, onOptionChange }) => {
   const [selectBook, setSelectBook] = useState();
@@ -54,6 +55,11 @@ const Bookshelves = ({ books, onOptionChange }) => {
       </div>
     </div>
   );
+};
+
+Bookshelves.propTypes = {
+  books: PropTypes.array,
+  onOptionChange: PropTypes.func,
 };
 
 export default Bookshelves;
